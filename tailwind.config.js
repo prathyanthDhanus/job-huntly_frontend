@@ -11,8 +11,12 @@ export default {
         "custom-lightBlue" : "#26A4FF",
         "custom-darkBlue" : "#4640DE",
         "custom-white" : "#ffffff",
-        "custom-lightGray" : "#9CA3AF"
+        "custom-lightGray" : "#9CA3AF",
+        "custom-green": "#10B981", 
+        "custom-red": "#EF4444",  
+        "custom-yellow": "#F59E0B",
      },
+     
     },
   },
   plugins: [],

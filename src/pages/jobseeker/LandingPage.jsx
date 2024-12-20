@@ -93,7 +93,7 @@ const LandingPage = () => {
       <div className="min-h-screen flex flex-col">
         {/* Hero Section */}
 
-        <section className="flex-1 flex flex-col md:flex-row items-center justify-center bg-blue-100 p-6 md:p-12">
+        <section className="flex-1 flex flex-col md:flex-row items-center justify-center bg-blue-100 p-6 md:p-12 lg:p-20">
           <div className="text-center md:text-left md:w-1/2 space-y-6">
             <h2 className="text-3xl poppins-bold text-blue-600">
               Find Your Dream Job with Job Huntly
@@ -102,6 +102,9 @@ const LandingPage = () => {
               Your one-stop platform to search, apply, and land your next job.
               Whether you're a seasoned professional or just starting, we've got
               you covered.
+            </p>
+            <p className="text-lg text-gray-700 poppins-regular">
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
             </p>
           </div>
           <div className="mt-6 md:mt-0 md:w-1/2">
@@ -114,7 +117,7 @@ const LandingPage = () => {
         {/* Features Section */}
         <section
           id="features"
-          className="py-12 px-6 md:px-12 p-5 sm:p-4 md:p-6 lg:p-8 rounded-md m-4 sm:m-2 md:m-4 lg:m-8"
+          className="py-12 px-6 md:px-12 p-5 sm:p-4 md:p-6 lg:p-8 rounded-md m-4 sm:m-2 md:m-4 lg:m-10"
         >
           <h5 className="text-4xl poppins-semibold ">
             Why Choose{" "}
@@ -153,7 +156,7 @@ const LandingPage = () => {
         <div >
           <section
             id="latestJob"
-            className="py-12 px-6 md:px-12 p-5 sm:p-4 md:p-6 lg:p-8 rounded-md m-4 sm:m-2 md:m-4 lg:m-8"
+            className="py-12 px-6 md:px-12 p-5 sm:p-4 md:p-6 lg:p-8 rounded-md m-4 sm:m-2 md:m-4 lg:m-10"
           >
             <h5 className="text-4xl poppins-semibold">
               Latest <span className="text-custom-lightBlue">Job Opens</span>
@@ -161,7 +164,7 @@ const LandingPage = () => {
           </section>
 
           {/* Grid Container */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4  py-10  bg-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4  py-20  bg-gray-100 px-7">
             {/* JobOpensCard components */}
             <JobOpensCard
               heading="Sample Heading"

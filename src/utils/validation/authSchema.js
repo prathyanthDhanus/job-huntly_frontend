@@ -13,40 +13,32 @@ export const nameValidation = Yup.string()
 export const emailValidation = Yup.string()
   .matches(emailRegex, "Invalid email address")
   .email("Invalid email address")
-  .required("Email is required");
+  .required("Email or Phonenumber required");
 // ------------------- email validation  section end --------------------
 
 // ------------------- password validation section --------------------
-export const passwordValidation = Yup.string()
-  .min(6, "Must be at least 6 characters")
-  .matches(/[a-z]/, "Must contain at least one lowercase letter")
-  .matches(/[A-Z]/, "Must contain at least one uppercase letter")
-  .matches(/[0-9]/, "Must contain at least one number")
-  .required("Password is required");
+export const phoneNumberValidation = Yup.string()
+.length(10, "Phone number must be exactly 10 digits")
+  .matches(/[0-9]/, "Invalid phonenumber format")
+  .required("Email or Phonenumber is required");
 // ------------------- password validation  section end --------------------
 
 // --------------------- login section ----------------------
-export const loginInitialValues = {
+export const otpWoithEmailLoginInitialValues = {
   email: "",
-  password: "",
 };
 
-export const loginSchema = Yup.object().shape({
+export const otpWoithEmailLoginSchema = Yup.object().shape({
   email: emailValidation,
-  password: passwordValidation,
+
+});
+export const otpWoithPhoneNumberLoginInitialValues = {
+  phoneNumber: "",
+};
+
+export const otpWoithPhoneNumberLoginSchema = Yup.object().shape({
+  phoneNumber: phoneNumberValidation,
+
 });
 //--------------------- login section end --------------------
 
-//--------------------- register section ----------------------
-export const registerInitialValues = {
-  userName: "",
-  email: "",
-  password: "",
-};
-
-export const registerSchema = Yup.object().shape({
-  userName: nameValidation,
-  email: emailValidation,
-  password: passwordValidation,
-});
-//-------------------- register section end ---------------------

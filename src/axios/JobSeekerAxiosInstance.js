@@ -3,7 +3,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import jwtDecode from "jwt-decode";
 
-const Axios = axios.create({
+const jobseekerAxios = axios.create({
   baseURL: "http://localhost:3000",
   headers: {
     Accept: "application/json",
@@ -57,4 +57,4 @@ Axios.interceptors.response.use(
   }
 );
 
-export default Axios;
+export default jobseekerAxios;

@@ -12,6 +12,7 @@ const JobseekerCreateProfile = lazy(() =>
   import("../../pages/jobseeker/JobseekerCreateProfile")
 );
 const About = lazy(() => import("../../pages/jobseeker/About"));
+const LoginPage = lazy(() => import("../../pages/jobseeker/LoginPage"));
 
 export const jobSeekerRouter = createBrowserRouter([
   {
@@ -34,6 +35,14 @@ export const jobSeekerRouter = createBrowserRouter([
         ),
       },
       {
+        path: "/login",
+        element: (
+          <Suspense fallback={<CommonLoader />}>
+            <LoginPage />
+          </Suspense>
+        ),
+      },
+      {
         path: "/unauthorized",
         element: <UnauthorizedPage />,
       },
@@ -45,9 +54,9 @@ export const jobSeekerRouter = createBrowserRouter([
         path: "/create/profile",
         element: (
           <Suspense fallback={<CommonLoader />}>
-            <PrivateRoute>
+            {/* <PrivateRoute> */}
               <JobseekerCreateProfile />
-            </PrivateRoute>
+            {/* </PrivateRoute> */}
           </Suspense>
         ),
       },
