@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //check for contain "@" and "." in the email
+export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //check for contain "@" and "." in the email
 
 // --------------------- name validation  section ----------------------
 export const nameValidation = Yup.string()

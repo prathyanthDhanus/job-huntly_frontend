@@ -18,11 +18,11 @@ const LandingPage = () => {
       <section className="grid grid-cols-1 md:grid-cols-2 lg:h-screen ml-5 ">
         {/* Left Section */}
         <div className="p-5 sm:p-4 md:p-6 lg:p-8 rounded-md m-4 sm:m-2 md:m-4 lg:m-8 ">
-          <div className="font-bold text-custom-yellow text-4xl sm:text-3xl md:text-5xl lg:text-6xl leading-tight lg:mt-10">
+          <div className="poppins-semibold text-4xl sm:text-3xl md:text-5xl lg:text-6xl leading-tight lg:mt-10">
             <h5>Discover</h5>
             <h5>Morethan</h5>
           </div>
-          <p className="font-bold mt-2 text-lg sm:text-base md:text-2xl lg:text-7xl text-custom-lightBlue">
+          <p className="poppins-bold mt-2 text-lg sm:text-base md:text-2xl lg:text-7xl text-custom-lightBlue">
             5000+ Jobs
           </p>
 

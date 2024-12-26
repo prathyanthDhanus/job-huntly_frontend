@@ -1,0 +1,5 @@
+.react-datepicker__input-container input:focus {
+    border-color: #26A4FF; /* Replace with your custom light blue color */
+    outline: none;
+  }
+  
