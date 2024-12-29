@@ -1,10 +1,8 @@
-
 import React from "react";
 
 const CustomFileInput = ({
   title,
   accept,
-  value,
   onChange,
   onBlur,
   name,
@@ -25,7 +23,7 @@ const CustomFileInput = ({
           accept={accept} // Control the file types allowed
           onChange={(e) => {
             const file = e.target.files[0];
-            onChange(file); // Pass the selected file to Formik
+            onChange(name, file); // Pass the file and field name to Formik's setFieldValue
           }}
           onBlur={onBlur}
           name={name}

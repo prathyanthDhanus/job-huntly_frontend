@@ -1,21 +1,21 @@
 import React, { useState } from "react";
+import { FaCirclePlus } from "react-icons/fa6";
+import { FaCircleMinus } from "react-icons/fa6";
+
 import vector from "../../assets/images/Vector.png";
 import CustomInputBox from "../../components/inputbox/CustomInput";
 import CustomFileInput from "../../components/inputbox/CustomFileInput";
 import CustomButton from "../../components/button/CustomButton";
 import Stepper from "../../components/stepper/Stepper";
 import Dropdown from "../../components/inputbox/Dropdown";
-import { FaCirclePlus } from "react-icons/fa6";
-import { FaCircleMinus } from "react-icons/fa6";
 import Calender from "../../components/inputbox/DatePicker";
+
 import { useGlobalFormik } from "../../customHooks/useFormik";
 import {
   educationInitialValues,
   educationSchema,
   personalInformationInitialValues,
   personalInformationSchema,
-  professionalSummeryInitialValues,
-  professionalSummerySchema,
   skillsInitialValues,
   skillsSchema,
   workExperienceInitailValues,
@@ -23,7 +23,15 @@ import {
 } from "../../utils/validation/jobseekerProfileValidation";
 
 const JobseekerCreateProfile = () => {
-  const [currentStep, setCurrentStep] = useState(1);
+  // const [currentStep, setCurrentStep] = useState(1);
+
+  // Initialize state with the value from localStorage or default to 1
+  const [currentStep, setCurrentStep] = useState(() => {
+    const savedStep = localStorage.getItem("currentStep");
+    return savedStep ? parseInt(savedStep, 10) : 1; // Parse saved value or use default 1
+  });
+  console.log("current step", currentStep);
+
   const steps = [
     { label: "01" },
     { label: "02 " },
@@ -53,43 +61,17 @@ const JobseekerCreateProfile = () => {
     initialValues: personalInformationInitialValues,
     validationSchema: personalInformationSchema,
     onSubmit: (values) => {
-      console.log(values);
+      console.log("personalInfoFormik", values);
+      localStorage.setItem("personalInfo", JSON.stringify(values));
     },
   });
-
-  const professionalSummeryFormik = useGlobalFormik({
-    initialValues: professionalSummeryInitialValues,
-    validationSchema: professionalSummerySchema,
-    onSubmit: (values) => {
-      console.log(values);
-    },
-  });
-
-  const goToNextStep = () => {
-    if (currentStep === 1) {
-      if (!personalInfoFormik.isValid || !professionalSummeryFormik.isValid) {
-        personalInfoFormik.handleSubmit();
-        professionalSummeryFormik.handleSubmit();
-        return;
-      }
-    }
-
-    if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const goToPreviousStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
 
   const skillsFormik = useGlobalFormik({
     initialValues: skillsInitialValues,
     validationSchema: skillsSchema,
     onSubmit: (values) => {
       console.log(values);
+      localStorage.setItem("skills", JSON.stringify(values));
     },
   });
 
@@ -98,6 +80,7 @@ const JobseekerCreateProfile = () => {
     validationSchema: workExperienceSchema,
     onSubmit: (values) => {
       console.log(values);
+      localStorage.setItem("workExperience", JSON.stringify(values));
     },
   });
 
@@ -106,8 +89,83 @@ const JobseekerCreateProfile = () => {
     validationSchema: educationSchema,
     onSubmit: (values) => {
       console.log(values);
+      localStorage.setItem("education", JSON.stringify(values));
     },
   });
+
+  const handleSaveProfile = () => {
+    // Retrieve data from localStorage
+    const personalInfo = JSON.parse(
+      localStorage.getItem("personalInfo") || "{}"
+    );
+    const skills = JSON.parse(localStorage.getItem("skills") || "{}");
+    const workExperience = JSON.parse(
+      localStorage.getItem("workExperience") || "{}"
+    );
+    const education = JSON.parse(localStorage.getItem("education") || "{}");
+
+    // Combine the data into a single object
+    const profileData = {
+      personalInfo,
+      skills,
+      workExperience,
+      education,
+    };
+
+    console.log("Profile Data:", profileData);
+
+    // Return or use the profileData object as needed
+    return profileData;
+  };
+
+  const formikSteps = {
+    1: personalInfoFormik,
+    2: skillsFormik,
+    3: workExperienceFormik,
+    4: educationFormik,
+  };
+
+  const saveCurrentStep = (nextStep) => {
+    setCurrentStep(nextStep);
+    localStorage.setItem("currentStep", nextStep); // Save step to localStorage
+  };
+
+  const savePersonalInfo = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+
+    const currentFormik = formikSteps[currentStep]; // Get the current Formik instance
+    const errors = await currentFormik.validateForm();
+
+    if (Object.keys(errors).length === 0) {
+      console.log(`Form Values for Step ${currentStep}:`, currentFormik.values);
+      currentFormik.handleSubmit(); // Trigger Formik's submission logic
+      if (currentStep < Object.keys(formikSteps).length) {
+        saveCurrentStep(currentStep + 1); // Move to the next step
+      }
+    } else {
+      currentFormik.setTouched(errors); // Mark fields as touched to show errors
+    }
+  };
+
+  const goToPreviousStep = (e) => {
+    e.preventDefault(); // Prevent default form submission
+    if (currentStep > 1) {
+      saveCurrentStep(currentStep - 1); // Move to the previous step
+    }
+  };
+
+  const handleFileChange = (name, file) => {
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        // Set the base64 string in Formik
+        personalInfoFormik.setFieldValue(name, reader.result);
+      };
+
+      reader.readAsDataURL(file); // Convert the file to a base64 string
+    }
+  };
 
   return (
     <>
@@ -267,35 +325,42 @@ const JobseekerCreateProfile = () => {
                       )}
                   </div>
                 </div>
-                <CustomFileInput
+                {/* <CustomFileInput
                   title="Upload File"
                   accept="image/*" // Accepts only image files
                   name="profilePhoto"
-                  value={personalInfoFormik.values.profilePhoto}
-                  onChange={personalInfoFormik.handleChange}
+                  onChange={(name, file) =>
+                    personalInfoFormik.setFieldValue(name, file)
+                  } // Update Formik's value
+                  onBlur={personalInfoFormik.handleBlur}
+                  error={personalInfoFormik.errors.profilePhoto}
+                  touched={personalInfoFormik.touched.profilePhoto}
+                /> */}
+                <CustomFileInput
+                  title="Upload File"
+                  accept="image/*"
+                  name="profilePhoto"
+                  onChange={(name, file) => {
+                    if (file) personalInfoFormik.setFieldValue(name, file); // Pass the file object
+                  }}
                   onBlur={personalInfoFormik.handleBlur}
                   error={personalInfoFormik.errors.profilePhoto}
                   touched={personalInfoFormik.touched.profilePhoto}
                 />
-              </form>
-            </section>
-
-            <section>
-              <p className="poppins-semibold text-xl mt-10">
-                Professional Summary
-              </p>
-              <form onSubmit={professionalSummeryFormik.handleSubmit}>
+                <p className="poppins-semibold text-xl mt-10">
+                  Professional Summary
+                </p>
                 <div className="grid gap-3 mt-5">
                   <CustomInputBox
                     title="HeadLine"
                     type="text"
                     placeholder="Enter Headline(eg: Experienced Frontend Developer)"
                     name="headLine"
-                    value={professionalSummeryFormik.values.headLine}
-                    onChange={professionalSummeryFormik.handleChange}
-                    onBlur={professionalSummeryFormik.handleBlur}
-                    error={professionalSummeryFormik.errors.headLine}
-                    touched={professionalSummeryFormik.touched.headLine}
+                    value={personalInfoFormik.values.headLine}
+                    onChange={personalInfoFormik.handleChange}
+                    onBlur={personalInfoFormik.handleBlur}
+                    error={personalInfoFormik.errors.headLine}
+                    touched={personalInfoFormik.touched.headLine}
                   />
                   <CustomInputBox
                     title="About You"
@@ -303,11 +368,11 @@ const JobseekerCreateProfile = () => {
                     placeholder="Short description about you"
                     name="about"
                     rows={6}
-                    value={professionalSummeryFormik.values.about}
-                    onChange={professionalSummeryFormik.handleChange}
-                    onBlur={professionalSummeryFormik.handleBlur}
-                    error={professionalSummeryFormik.errors.about}
-                    touched={professionalSummeryFormik.touched.about}
+                    value={personalInfoFormik.values.about}
+                    onChange={personalInfoFormik.handleChange}
+                    onBlur={personalInfoFormik.handleBlur}
+                    error={personalInfoFormik.errors.about}
+                    touched={personalInfoFormik.touched.about}
                   />
                 </div>
               </form>
@@ -521,16 +586,29 @@ const JobseekerCreateProfile = () => {
           />
 
           <div>
-            {" "}
-            <Stepper steps={steps} currentStep={3} />
+            , <Stepper steps={steps} currentStep={currentStep} />
           </div>
-          <div className="flex lg:justify-end ">
-            <CustomButton
-              buttonText="Next"
-              className="lg:w-[7rem] w-full my-5 bg-custom-lightBlue text-white poppins-semibold hover:text-custom-lightBlue hover:bg-white hover:border-custom-lightBlue "
-              type="submit"
-              onClick={goToNextStep}
-            />
+          <div className="lg:flex lg:justify-end ">
+            {currentStep === 4 ? (
+              <>
+                <CustomButton
+                  buttonText="Submit"
+                  className="lg:w-[7rem] w-full my-5 bg-custom-lightBlue text-white poppins-semibold hover:text-custom-lightBlue hover:bg-white hover:border-custom-lightBlue "
+                  type="submit"
+                  onClick={handleSaveProfile}
+                />
+              </>
+            ) : (
+              <>
+                <CustomButton
+                  buttonText="Next"
+                  className="lg:w-[7rem] w-full my-5 bg-custom-lightBlue text-white poppins-semibold hover:text-custom-lightBlue hover:bg-white hover:border-custom-lightBlue "
+                  type="submit"
+                  onClick={savePersonalInfo}
+                  // onClick={next}
+                />
+              </>
+            )}
           </div>
         </div>
       </div>

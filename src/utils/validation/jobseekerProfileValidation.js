@@ -18,9 +18,26 @@ export const phoneNumberValidation = Yup.string()
   .matches(/[0-9]/, "Invalid phonenumber format")
   .required("Phonenumber is required");
 
-export const dobValidation = Yup.string().required("Date of birth is required");
+  export const dobValidation = Yup.date()
+  .required("Date of birth is required")
+  .max(new Date(), "Date of birth cannot be in the future")
+  .test(
+    "age",
+    "You must be at least 18 years old",
+    (value) => {
+      const today = new Date();
+      const age = today.getFullYear() - new Date(value).getFullYear();
+      return age >= 18;
+    }
+  );
 
-export const linkedinValidation = Yup.string().required("Linkedin is required");
+  export const linkedinValidation = Yup.string()
+  .required("LinkedIn profile is required")
+  .matches(
+    /^https:\/\/[a-z]{2,3}\.linkedin\.com\/.*$/i,
+    "Invalid LinkedIn URL"
+  );
+
 
 export const currentCityValidation = Yup.string().required(
   "Current city is required"
@@ -34,11 +51,24 @@ export const currentCountryValidation = Yup.string().required(
   "Current country is required"
 );
 
-export const genderValidation = Yup.string().required("Gender is required");
+export const genderValidation = Yup.string()
+  .required("Gender is required")
+  
 
-export const profilePhotoValidation = Yup.string().required(
-  "Profile photo is required"
-);
+  export const profilePhotoValidation = Yup.mixed()
+  .required("Profile photo is required")
+  .test(
+    "fileFormat",
+    "Unsupported file format",
+    (value) => value && /\.(jpg|jpeg|png)$/i.test(value.name)
+  );
+
+
+export const headLineValidation = Yup.string().required("Headline is required");
+export const aboutValidation = Yup.string()
+  .required("About is required")
+  .min(20, "About must be at least 20 characters")
+  .max(1000, "About cannot exceed 1000 characters");
 
 export const personalInformationInitialValues = {
   fullName: "",
@@ -50,7 +80,9 @@ export const personalInformationInitialValues = {
   currentState: "",
   currentCountry: "",
   gender: "",
-  profilePhoto: "",
+  profilePhoto: null,
+  headLine: "",
+  about: "",
 };
 
 export const personalInformationSchema = Yup.object({
@@ -64,25 +96,11 @@ export const personalInformationSchema = Yup.object({
   currentCountry: currentCountryValidation,
   gender: genderValidation,
   profilePhoto: profilePhotoValidation,
-});
-
-//================= professional summery ==============
-
-export const headLineValidation = Yup.string().required("Headline is required");
-export const aboutValidation = Yup.string()
-  .required("About is required")
-  .min(20, "About must be at least 20 characters")
-  .max(1000, "About cannot exceed 1000 characters");
-
-export const professionalSummeryInitialValues = {
-  headLine: "",
-  about: "",
-};
-
-export const professionalSummerySchema = Yup.object({
   headLine: headLineValidation,
   about: aboutValidation,
 });
+
+
 
 //================= skills ==============
 

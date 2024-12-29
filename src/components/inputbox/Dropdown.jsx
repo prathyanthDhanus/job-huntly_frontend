@@ -69,7 +69,7 @@ const Dropdown = ({
         </div>
       )}
       {touched && error && (
-        <div className="text-red-500 mt-1 text-xs md:text-sm">{error}</div>
+        <div className="text-red-500 mt-1 text-xs md:text-xs lg:text-xs xl:text-xs xxl:text-md">{error}</div>
       )}
     </div>
   );
