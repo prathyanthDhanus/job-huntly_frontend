@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { FaCirclePlus } from "react-icons/fa6";
 import { FaCircleMinus } from "react-icons/fa6";
 
@@ -47,14 +47,14 @@ const JobseekerCreateProfile = () => {
   ];
 
   const educationMenuItems = [
-    { label: "Plus Two", value: "plusTwo" },
+    { label: "Plus Two (Higher Secondary)", value: "plusTwo" },
     { label: "Diploma", value: "diploma" },
-    { label: "UG", value: "ug" },
-    { label: "PG", value: "pg" },
-    { label: "B Tech", value: "btech" },
-    { label: "M Tech", value: "mtech" },
-    { label: "Phd", value: "phd" },
-    { label: "others", value: "others" },
+    { label: "Undergraduate (UG)", value: "ug" },
+    { label: "Postgraduate (PG)", value: "pg" },
+    { label: "Bachelor of Technology (B.Tech)", value: "btech" },
+    { label: "Master of Technology (M.Tech)", value: "mtech" },
+    { label: "Doctorate (Ph.D.)", value: "phd" },
+    { label: "Others", value: "others" },
   ];
 
   const personalInfoFormik = useGlobalFormik({
@@ -118,6 +118,29 @@ const JobseekerCreateProfile = () => {
     return profileData;
   };
 
+  // Load data for each formik instance from localStorage on component mount
+  useEffect(() => {
+    const savedPersonalInfo = localStorage.getItem("personalInfo");
+    if (savedPersonalInfo) {
+      personalInfoFormik.setValues(JSON.parse(savedPersonalInfo));
+    }
+
+    const savedSkills = localStorage.getItem("skills");
+    if (savedSkills) {
+      skillsFormik.setValues(JSON.parse(savedSkills));
+    }
+
+    const savedWorkExperience = localStorage.getItem("workExperience");
+    if (savedWorkExperience) {
+      workExperienceFormik.setValues(JSON.parse(savedWorkExperience));
+    }
+
+    const savedEducation = localStorage.getItem("education");
+    if (savedEducation) {
+      educationFormik.setValues(JSON.parse(savedEducation));
+    }
+  }, []); // Only runs on mount
+
   const formikSteps = {
     1: personalInfoFormik,
     2: skillsFormik,
@@ -149,15 +172,24 @@ const JobseekerCreateProfile = () => {
 
   const goToPreviousStep = (e) => {
     e.preventDefault(); // Prevent default form submission
+
     if (currentStep > 1) {
       saveCurrentStep(currentStep - 1); // Move to the previous step
+
+      // Dynamically load data for the previous step
+      const previousStepFormik = formikSteps[currentStep - 1];
+      const savedData = localStorage.getItem(
+        Object.keys(formikSteps)[currentStep - 2]
+      );
+      if (savedData) {
+        previousStepFormik.setValues(JSON.parse(savedData)); // Populate Formik fields
+      }
     }
   };
 
   const handleFileChange = (name, file) => {
     if (file) {
       const reader = new FileReader();
-
       reader.onload = () => {
         // Set the base64 string in Formik
         personalInfoFormik.setFieldValue(name, reader.result);
@@ -325,28 +357,17 @@ const JobseekerCreateProfile = () => {
                       )}
                   </div>
                 </div>
-                {/* <CustomFileInput
+
+                <CustomFileInput
                   title="Upload File"
                   accept="image/*" // Accepts only image files
                   name="profilePhoto"
-                  onChange={(name, file) =>
-                    personalInfoFormik.setFieldValue(name, file)
-                  } // Update Formik's value
-                  onBlur={personalInfoFormik.handleBlur}
-                  error={personalInfoFormik.errors.profilePhoto}
-                  touched={personalInfoFormik.touched.profilePhoto}
-                /> */}
-                <CustomFileInput
-                  title="Upload File"
-                  accept="image/*"
-                  name="profilePhoto"
-                  onChange={(name, file) => {
-                    if (file) personalInfoFormik.setFieldValue(name, file); // Pass the file object
-                  }}
+                  onChange={(name, file) => handleFileChange(name, file)} // Convert to base64 and update Formik value
                   onBlur={personalInfoFormik.handleBlur}
                   error={personalInfoFormik.errors.profilePhoto}
                   touched={personalInfoFormik.touched.profilePhoto}
                 />
+
                 <p className="poppins-semibold text-xl mt-10">
                   Professional Summary
                 </p>
@@ -386,33 +407,102 @@ const JobseekerCreateProfile = () => {
               <p className="poppins-semibold text-xl mt-10">Skills</p>
               <form onSubmit={skillsFormik.handleSubmit}>
                 <div className="grid grid-cols-2 gap-5 mt-5">
-                  <CustomInputBox
-                    title="Technical Skills"
-                    type="text"
-                    placeholder="Enter Technical Skills(eg: React.js,Web Developement)"
-                    name="technicalSkill"
-                    value={skillsFormik.values.technicalSkill}
-                    onChange={skillsFormik.handleChange}
-                    onBlur={skillsFormik.handleBlur}
-                    error={skillsFormik.errors.technicalSkill}
-                    touched={skillsFormik.touched.technicalSkill}
-                  />
-                  <CustomInputBox
-                    title="Soft Skills"
-                    type="text"
-                    placeholder="Enter Your Soft Skills(eg: Team-work,Leadership)"
-                    name="softSkill"
-                    value={skillsFormik.values.softSkill}
-                    onChange={skillsFormik.handleChange}
-                    onBlur={skillsFormik.handleBlur}
-                    error={skillsFormik.errors.softSkill}
-                    touched={skillsFormik.touched.softSkill}
-                  />
+                  {/* Technical Skills Section */}
+                  <div className="grid grid-cols-7 items-center">
+                    <div className="col-span-6">
+                      <CustomInputBox
+                        title="Technical Skills"
+                        type="text"
+                        placeholder="Enter Technical Skills (e.g., React.js, Web Development)"
+                        name="technicalSkill"
+                        value={skillsFormik.values.technicalSkill}
+                        onChange={skillsFormik.handleChange}
+                        onBlur={skillsFormik.handleBlur}
+                        error={skillsFormik.errors.technicalSkill}
+                        touched={skillsFormik.touched.technicalSkill}
+                      />
+                    </div>
+                    <FaCirclePlus
+                      className="text-custom-yellow text-xl cursor-pointer mx-7 mt-10"
+                      onClick={() => {
+                        if (skillsFormik.values.technicalSkill) {
+                          skillsFormik.setFieldValue("technicalSkills", [
+                            ...skillsFormik.values.technicalSkills,
+                            skillsFormik.values.technicalSkill,
+                          ]);
+                          skillsFormik.setFieldValue("technicalSkill", ""); // Clear input field
+                          skillsFormik.validateField("technicalSkills"); // Manually trigger validation
+                        }
+                      }}
+                    />
+                  </div>
+
+                  {/* Soft Skills Section */}
+                  <div className="grid grid-cols-7 items-center">
+                    <div className="col-span-6">
+                      <CustomInputBox
+                        title="Soft Skills"
+                        type="text"
+                        placeholder="Enter Your Soft Skills (e.g., Teamwork, Leadership)"
+                        name="softSkill"
+                        value={skillsFormik.values.softSkill}
+                        onChange={skillsFormik.handleChange}
+                        onBlur={skillsFormik.handleBlur}
+                        error={skillsFormik.errors.softSkill}
+                        touched={skillsFormik.touched.softSkill}
+                      />
+                    </div>
+                    <FaCirclePlus
+                      className="text-custom-yellow text-xl cursor-pointer mx-7 mt-10"
+                      onClick={() => {
+                        if (skillsFormik.values.softSkill) {
+                          skillsFormik.setFieldValue("softSkills", [
+                            ...skillsFormik.values.softSkills,
+                            skillsFormik.values.softSkill,
+                          ]);
+                          skillsFormik.setFieldValue("softSkill", ""); // Clear input field
+                          skillsFormik.validateField("softSkills"); // Manually trigger validation
+                        }
+                      }}
+                    />
+                  </div>
                 </div>
+
+                {/* List Skills */}
+                <div className="mt-5">
+                  <p className="poppins-semibold text-lg">Listed Skills:</p>
+                  <div className="mt-3">
+                    <p className="font-medium">Technical Skills:</p>
+                    <ul className="list-disc ml-6">
+                      {skillsFormik.values.technicalSkills.map(
+                        (skill, index) => (
+                          <li key={index}>{skill}</li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+                  <div className="mt-3">
+                    <p className="font-medium">Soft Skills:</p>
+                    <ul className="list-disc ml-6">
+                      {skillsFormik.values.softSkills.map((skill, index) => (
+                        <li key={index}>{skill}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  className="mt-5 bg-custom-yellow px-6 py-2 rounded-md text-white font-semibold"
+                >
+                  Save Skills
+                </button>
               </form>
             </section>
           </>
         )}
+
         {currentStep === 3 && (
           <>
             <section>
@@ -577,7 +667,7 @@ const JobseekerCreateProfile = () => {
           </>
         )}
 
-        <div className="grid sm:grid-cols-1 md:grid-cols-1  lg:grid-cols-3  xl:grid-cols-3  gap-5 lg:justify-between lg:items-center m-5">
+        <div className="grid sm:grid-cols-1 md:grid-cols-1  lg:grid-cols-3  xl:grid-cols-3  gap-5 lg:justify-between lg:items-center m-5 justify-center ">
           <CustomButton
             buttonText="Previous"
             className="lg:w-1/4 w-full my-5 bg-custom-lightBlue text-white poppins-semibold hover:text-custom-lightBlue hover:bg-white hover:border-custom-lightBlue"
@@ -588,7 +678,7 @@ const JobseekerCreateProfile = () => {
           <div>
             , <Stepper steps={steps} currentStep={currentStep} />
           </div>
-          <div className="lg:flex lg:justify-end ">
+          <div className="lg:flex lg:justify-end  ">
             {currentStep === 4 ? (
               <>
                 <CustomButton
